@@ -1,2 +1,14 @@
 # .gitignore
-.env
+settings.env
+.vscode
+# configs 폴더 안의 __pycache__ 무시
+configs/__pycache__
+
+# 가상환경 mcp 폴더 무시
+mcp/
+
+# mcp_client.log 파일 무시
+mcp_client.log
+
+__pycache__
+.idea
