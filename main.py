@@ -12,7 +12,7 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
-    server_script_path: str = "http://localhost:8001/sse"
+    server_script_path: str = "http://localhost:8080/sse"
 
 
 settings = Settings()
@@ -87,4 +87,4 @@ async def get_tools():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
