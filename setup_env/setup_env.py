@@ -31,7 +31,11 @@ def install_requirements():
         print(f"⚠️ {REQUIREMENTS_FILE} 없음. 설치 생략.")
         return
 
-    python_exec = VENV_DIR / ("Scripts" if platform.system() == "Windows" else "bin") / "python3"
+    if platform.system() == "Windows":
+        python_exec = VENV_DIR / "Scripts" / "python.exe"
+    else:
+        python_exec = VENV_DIR / "bin" / "python3"
+
     install_pip_if_missing(python_exec)
 
     print(f"📦 requirements.txt 설치 중...")
