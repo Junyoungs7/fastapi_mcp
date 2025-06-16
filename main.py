@@ -55,31 +55,20 @@ async def health_check():
 
 @app.post("/chat")
 async def process_query(request: ChatRequest):
-    """Process a query and return the response"""
-
+    """Process a query and return the final assistant response only"""
     try:
         messages = await app.state.client.process_chat_message(request.message)
-        return {"messages": messages}
+        final_response = None
+        for message in reversed(messages):
+            if message.get("role") == "assistant":
+                final_response = message
+                break
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        if final_response is None:
+            final_response = {"role": "assistant", "content": "죄송합니다. 정보를 제공해줄 수 없습니다."}
 
+        return {"messages": final_response}
 
-@app.get("/tools")
-async def get_tools():
-    """Get the list of available tools"""
-    try:
-        tools = await app.state.client.get_mcp_tools()
-        return {
-            "tools": [
-                {
-                    "name": tool.name,
-                    "description": tool.description,
-                    "input_schema": tool.inputSchema,
-                }
-                for tool in tools
-            ]
-        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
