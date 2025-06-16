@@ -16,7 +16,7 @@ async def main():
     
     st.set_page_config(
         page_title="AI Chatbot",
-        page_icon=":robot_face:"
+        page_icon="🤖"
     )
     
     chatbot = Chatbot(API_URL)
