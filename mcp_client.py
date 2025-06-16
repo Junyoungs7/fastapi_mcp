@@ -40,38 +40,38 @@ class OpenAI_MCPClient:
     # connect to MCP server
     async def connect_to_server(self, server_url: str):
         try:
-            # sse_client와 ClientSession을 async with로 안전하게 열고 닫음
-            async with sse_client(url=server_url) as streams:
-                async with ClientSession(*streams) as session:
-                    self.session = session
-                    await self.session.initialize()
-                    self.logger.info("Connected to MCP server successfully.")
+            self._streams_context = sse_client(url=server_url)
+            streams = await self._streams_context.__aenter__()
 
-                    mcp_tools = await self.get_mcp_tools()
-                    self.tools = [
-                        ChatCompletionToolParam(
-                            type="function",
-                            function={
-                                "name": tool.name,
-                                "description": tool.description or "",
-                                "parameters": tool.inputSchema,
-                            },
-                        )
-                        for tool in mcp_tools
-                    ]
-                    self.logger.info(
-                        f"Successfully connected to server. Available tools: {[tool['function']['name'] for tool in self.tools]}"
-                    )
-                    # 연결 성공 상태를 유지하기 위해 필요하면 self._streams_context, self._session_context 저장
-                    # 또는 session 객체만 저장 후 외부에서 종료 관리
+            self._session_context = ClientSession(*streams)
+            self.session = await self._session_context.__aenter__()
 
-                    # 성공하면 True 리턴
-                    return True
+            await self.session.initialize()
+
+            mcp_tools = await self.get_mcp_tools()
+            self.tools = [
+                ChatCompletionToolParam(
+                    type="function",
+                    function={
+                        "name": tool.name,
+                        "description": (
+                            tool.description if tool.description is not None else ""
+                        ),
+                        "parameters": tool.inputSchema,
+                    },
+                )
+                for tool in mcp_tools
+            ]
+            self.logger.info(
+                f"Successfully connected to server. Available tools: {[tool['function']['name'] for tool in self.tools]}"
+            )
+
+            return True
 
         except Exception as e:
             self.logger.error(f"Failed to connect to server: {str(e)}")
             self.logger.debug(f"Connection error details: {traceback.format_exc()}")
-            return False
+            raise Exception(f"Failed to connect to server: {str(e)}")
 
 
     # get mcp tool list

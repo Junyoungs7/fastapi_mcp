@@ -1,5 +1,4 @@
 import asyncio
-from configs.logging import logger
 import streamlit as st
 from chatbot import Chatbot
 
@@ -13,7 +12,7 @@ async def main():
     if "messages" not in st.session_state:
         st.session_state["messages"] = []
         
-    API_URL = "http://localhost:8000"  # Replace with your actual API URL
+    API_URL = "http://localhost:8001"  # Replace with your actual API URL
     
     st.set_page_config(
         page_title="AI Chatbot",
