@@ -1,4 +1,3 @@
-import asyncio
 import streamlit as st
 from chatbot import Chatbot
 
@@ -22,7 +21,8 @@ async def main():
     chatbot = Chatbot(API_URL)
 
     await chatbot.render()
-    
+
+import asyncio
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,6 +1,6 @@
 import streamlit as st
-import httpx
 from typing import Dict, Any
+import http_client as client
 
 class Chatbot:
     def __init__(self, api_url: str):
@@ -28,9 +28,8 @@ class Chatbot:
         st.title("🤖 AI Chatbot")
 
         with st.sidebar:
-            if st.button("새 채팅"):
+            if st.button("✏️ 새 채팅"):
                 st.session_state["messages"] = []
-
 
         if st.session_state["messages"]:
             for message in st.session_state["messages"]:
@@ -42,11 +41,7 @@ class Chatbot:
             st.chat_message("user").markdown(query)
 
             with st.spinner("답변을 생성하는 중입니다"):
-                async with httpx.AsyncClient(timeout=60.0) as client:
-                    response = await client.post(
-                        f"{self.api_url}/chat", json={"message": query}
-                    )
-                    if response.status_code == 200:
-                        message = response.json()["messages"]
-                        st.session_state["messages"].append(message)
-                        st.chat_message("assistant").markdown(message["content"])
+                message = await client.fetch_chat_response(self.api_url, query)
+                if message:
+                    st.session_state["messages"].append(message)
+                    st.chat_message("assistant").markdown(message["content"])

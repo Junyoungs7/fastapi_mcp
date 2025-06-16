@@ -8,6 +8,11 @@ from pydantic_settings import BaseSettings
 from mcp_client import OpenAI_MCPClient
 from models.chat_request import ChatRequest
 
+from dbconnection import diablo
+from repositories import conversations_repository
+import uuid
+import logging
+
 load_dotenv()
 
 
@@ -55,25 +60,34 @@ async def health_check():
 
 @app.post("/chat")
 async def process_query(request: ChatRequest):
-    """Process a query and return the final assistant response only"""
     try:
         messages = await app.state.client.process_chat_message(request.message)
-        final_response = None
-        for message in reversed(messages):
-            if message.get("role") == "assistant":
-                final_response = message
-                break
 
-        if final_response is None:
-            final_response = {"role": "assistant", "content": "죄송합니다. 정보를 제공해줄 수 없습니다."}
+        if not isinstance(messages, list):
+            raise ValueError("응답 형식이 잘못되었습니다. 리스트가 아닙니다.")
+
+        final_response = next(
+            (m for m in reversed(messages) if m.get("role") == "assistant"),
+            {"role": "assistant", "content": "죄송합니다. 정보를 제공해줄 수 없습니다."}
+        )
+
+        session_id = str(uuid.uuid4())
+
+        try:
+            await conversations_repository.insert_mcp_conversation(session_id, "999", request.message, final_response["content"])
+        except Exception as db_error:
+            logging.exception("DB 저장 중 오류 발생:")
 
         return {"messages": final_response}
 
     except Exception as e:
+        logging.exception("처리 중 예외 발생:")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 if __name__ == "__main__":
     import uvicorn
 
+    diablo.init_db_connection()
     uvicorn.run(app, host="0.0.0.0", port=8001)
