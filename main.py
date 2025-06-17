@@ -60,6 +60,9 @@ async def health_check():
 
 @app.post("/chat")
 async def process_query(request: ChatRequest):
+    emp_info = "내 이름(emp_name)은 김준영이고, 사번(emp_code)은 2023243이며 부서명(team_name)은 IT개발팀입니다. 해당 정보를 바탕으로 요청에 답변해주세요."
+    if request.message:
+        request.message = f"{emp_info} {request.message}"
     try:
         messages = await app.state.client.process_chat_message(request.message)
 

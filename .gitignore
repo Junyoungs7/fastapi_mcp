@@ -15,3 +15,7 @@ mcp_client.log
 **/__pycache__/
 *.pyc
 .idea
+conversions/__pycache__/
+models/__pycache__/
+
+__pycache__/
