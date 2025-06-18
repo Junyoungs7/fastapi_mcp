@@ -28,11 +28,7 @@ class OpenAI_MCPClient:
         system_prompt = {
             "role": "system",
             "content": """
-                You are an assistant that uses tools to answer programming questions.
-                You are allowed to use the tool 'get_docs' to fetch library documentation.
-                Important: You MUST call the 'get_docs' tool at most ONCE per user message. 
-                If the user mentions multiple libraries, choose the single most relevant one and fetch only that. 
-                Explain clearly if more than one is needed, but do not call the tool multiple times.
+                If you can't find the right tool, you can generate the answer yourself.
             """,
         }
         self.messages.append(system_prompt)

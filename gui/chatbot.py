@@ -1,6 +1,7 @@
 import streamlit as st
 from typing import Dict, Any
 import http_client as client
+import time
 
 class Chatbot:
     def __init__(self, api_url: str):
@@ -44,4 +45,9 @@ class Chatbot:
                 message = await client.fetch_chat_response(self.api_url, query)
                 if message:
                     st.session_state["messages"].append(message)
-                    st.chat_message("assistant").markdown(message["content"])
+                    with st.chat_message("assistant"):
+                        def stream_text():
+                            for char in message["content"]:
+                                yield char
+                                time.sleep(0.05)
+                        st.write_stream(stream_text())
