@@ -10,7 +10,6 @@ from models.chat_request import ChatRequest
 
 from dbconnection import diablo
 from repositories import conversations_repository
-import uuid
 import logging
 
 load_dotenv()
@@ -71,8 +70,8 @@ async def process_query(request: ChatRequest):
             {"role": "assistant", "content": "죄송합니다. 정보를 제공해줄 수 없습니다."}
         )
 
-        session_id = str(uuid.uuid4())
 
+        session_id = request.session_id
         try:
             await conversations_repository.insert_mcp_conversation(session_id, "999", request.message, final_response["content"])
         except Exception as db_error:

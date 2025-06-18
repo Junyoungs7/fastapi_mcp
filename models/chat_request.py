@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 class ChatRequest(BaseModel):
     message: str
+    session_id: str
 
 
 class Message(BaseModel):

@@ -2,6 +2,7 @@ import streamlit as st
 from typing import Dict, Any
 import http_client as client
 import time
+import uuid
 
 class Chatbot:
     def __init__(self, api_url: str):
@@ -29,8 +30,16 @@ class Chatbot:
         st.title("🤖 AI Chatbot")
 
         with st.sidebar:
+            st.sidebar.header("📜 채팅 내역")
+
             if st.button("✏️ 새 채팅"):
                 st.session_state["messages"] = []
+                st.session_state["session_id"] = str(uuid.uuid4())
+                st.rerun()
+
+        # 세션 ID 없으면 초기화 (최초 접근 시)
+        if "session_id" not in st.session_state:
+            st.session_state["session_id"] = str(uuid.uuid4())
 
         if st.session_state["messages"]:
             for message in st.session_state["messages"]:
@@ -42,12 +51,14 @@ class Chatbot:
             st.chat_message("user").markdown(query)
 
             with st.spinner("답변을 생성하는 중입니다"):
-                message = await client.fetch_chat_response(self.api_url, query)
+                session_id = st.session_state["session_id"]
+                message = await client.fetch_chat_response(self.api_url, query, session_id)
                 if message:
                     st.session_state["messages"].append(message)
                     with st.chat_message("assistant"):
                         def stream_text():
                             for char in message["content"]:
                                 yield char
-                                time.sleep(0.05)
+                                time.sleep(0.02)
+
                         st.write_stream(stream_text())

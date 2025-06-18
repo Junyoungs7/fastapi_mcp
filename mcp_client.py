@@ -28,7 +28,10 @@ class OpenAI_MCPClient:
         system_prompt = {
             "role": "system",
             "content": """
-                If you can't find the right tool, you can generate the answer yourself.
+                You are an AI assistant that can only respond by using the provided tools. 
+                Do not attempt to answer questions outside the scope of the tools. Do not generate general or free-form answers.
+                If a user's query cannot be answered using the available tools, respond with:
+                "죄송합니다. 해당 요청은 제공된 도구만으로는 처리할 수 없습니다."
             """,
         }
         self.messages.append(system_prompt)
