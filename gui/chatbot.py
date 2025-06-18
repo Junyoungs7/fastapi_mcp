@@ -29,6 +29,8 @@ class Chatbot:
     async def render(self):
         st.title("🤖 AI Chatbot")
 
+        chat_list = await client.get_chat_list(self.api_url, 999)
+
         with st.sidebar:
             st.sidebar.header("📜 채팅 내역")
 
@@ -36,6 +38,18 @@ class Chatbot:
                 st.session_state["messages"] = []
                 st.session_state["session_id"] = str(uuid.uuid4())
                 st.rerun()
+
+            if chat_list:
+                for chat in chat_list:
+                    if st.button(chat.get("SESSION_ID")):
+                        chat_id = chat["SESSION_ID"]
+                        messages = await client.get_chat_messages(self.api_url, chat_id)
+
+                        if messages:
+                            st.session_state["messages"] = []
+                            st.session_state["messages"] = messages
+                            st.session_state["session_id"] = chat_id
+                            st.rerun()
 
         # 세션 ID 없으면 초기화 (최초 접근 시)
         if "session_id" not in st.session_state:
