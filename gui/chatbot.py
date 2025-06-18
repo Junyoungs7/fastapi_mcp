@@ -32,7 +32,7 @@ class Chatbot:
         chat_list = await client.get_chat_list(self.api_url, 999)
 
         with st.sidebar:
-            st.sidebar.header("📜 채팅 내역")
+            st.header("📜 채팅 내역")
 
             if st.button("✏️ 새 채팅"):
                 st.session_state["messages"] = []

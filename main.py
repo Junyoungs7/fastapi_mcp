@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi import Query
+from fastapi import Path
+
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic_settings import BaseSettings
 
@@ -93,6 +95,17 @@ async def get_chat_list(emp_code: str = Query(...)):
     except Exception as e:
         logging.exception("채팅 목록 조회 중 오류 발생:")
         raise HTTPException(status_code=500, detail="채팅 목록을 불러오는 중 오류가 발생했습니다.")
+
+
+
+@app.get("/chat/{chat_id}/messages")
+async def get_chat_messages_endpoint(chat_id: str = Path(...)):
+    try:
+        messages = await conversations_repository.get_chat_messages(chat_id)
+        return {"chat_message_list": messages}
+    except Exception as e:
+        logging.exception("채팅 메시지 조회 중 오류 발생:")
+        raise HTTPException(status_code=500, detail="채팅 메시지를 불러오는 중 오류가 발생했습니다.")
 
 
 

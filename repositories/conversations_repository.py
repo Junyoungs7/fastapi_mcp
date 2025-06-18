@@ -20,3 +20,31 @@ async def get_chat_list(emp_code: str):
     params = (emp_code,)
     results = db.execute_query(query, params)
     return results
+
+
+async def get_chat_messages(session_id: str):
+    query = """
+        SELECT EMP_MESSAGE, AI_MESSAGE, NEW_DATE
+        FROM dbo.TMP_MCP_CONVERSATION
+        WHERE SESSION_ID = ?
+        ORDER BY NEW_DATE ASC
+    """
+    params = (session_id,)
+    rows = db.execute_query(query, params)
+
+    messages = []
+    for row in rows:
+        if row["EMP_MESSAGE"]:
+            messages.append({
+                "role": "user",
+                "content": row["EMP_MESSAGE"],
+                "new_date": row["NEW_DATE"]
+            })
+        if row["AI_MESSAGE"]:
+            messages.append({
+                "role": "assistant",
+                "content": row["AI_MESSAGE"],
+                "new_date": row["NEW_DATE"]
+            })
+
+    return messages
